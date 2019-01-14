@@ -1,11 +1,18 @@
 ﻿
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMotor : MonoBehaviour
 {
 
+    // Optional camera movement
+    [SerializeField]
+    private Camera cameraObject = null;
+
     private Vector3 velocity = Vector3.zero;
+    private Vector3 playerHorizontalRotation = Vector3.zero;
+    private Vector3 playerVerticalRotation = Vector3.zero;
 
     private Rigidbody rb;
 
@@ -20,9 +27,20 @@ public class PlayerMotor : MonoBehaviour
         velocity = _velocity;
     }
 
+    public void Rotate(Vector3 newrotation)
+    {
+        playerHorizontalRotation = newrotation;
+    }
+
+    public void RotateCamera(Vector3 cameraRotation)
+    {
+        playerVerticalRotation = cameraRotation; 
+    }
+
     private void FixedUpdate()
     {
         PerformMovement();
+        PerformRotation();
     }
 
     private void PerformMovement()
@@ -32,4 +50,19 @@ public class PlayerMotor : MonoBehaviour
             rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
         }
     }
+
+    private void PerformRotation()
+    {
+        if(playerHorizontalRotation != Vector3.zero)
+        {
+            rb.MoveRotation(rb.rotation * Quaternion.Euler(playerHorizontalRotation));
+        }
+
+        if(cameraObject != null)
+        {
+            cameraObject.transform.Rotate(-playerVerticalRotation);
+        }
+    }
+    
+
 }
